@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title></title>
+    {% load staticfiles %}
+    <link rel="stylesheet" href='{% static "pure-min.css" %}'>    
+    <link rel="stylesheet" href='{% static "side-menu.css" %}'>    
+    </head>
+<body>
+    <div id="layout">
+<a href="#menu" id="menuLink" class="menu-link"><span></span></a>
+
+        <div id="menu">
+            <div class="pure-menu pure-menu-open">
+                <a class="pure-menu-heading" href="#">Substance!</a>
+
+                <ul>
+                    <li><a href="/admin">Home</a></li>
+                    <li><a href="/admin/abstracts">Abstracts</a></li>
+
+                    <li>
+                        <a href="/admin/posts">Posts</a>
+                    </li>
+
+                    <li><a href="/admin/logs">Access Log</a></li>
+                </ul>
+            </div>
+        </div>
+        <div id="main">
+            <div class="header">
+                <h2>Preparing the conference...</h2>
+            </div>
+            <div class="content">
+                {% block content %}{% endblock %}
+            </div>
+        </div>
+    </div>
+
+    <script src="{% static 'ui.js' %}"></script>
+</body>
+</html>

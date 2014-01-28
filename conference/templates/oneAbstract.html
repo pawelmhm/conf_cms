@@ -1,0 +1,11 @@
+{% extends "layout.html" %}
+
+{% block content %}
+    <h2>Abstracts</h2>
+    <h3>{{ abstract.title }}</h3>
+    <h4>by {{abstract.author}} Submitted on <b> {{ abstract.date}}</b> </h4>
+    <p> {{abstract.content}} </p>
+    <p> Affiliation {{ abstract.affilliation }} </p>
+    <p> Email {{ abstract.email }} </p>
+
+{% endblock %}
