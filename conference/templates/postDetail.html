@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 
 {% block content %}
-<h1> {{post.title }} </h1>   
-<p> {{post.content }} </p>
-<small> {{post.date }} </p>
+<form action="" method="post"> {% csrf_token %}
+{{form.as_p}}
+<input type="submit" class="pure-button">
+</form>
+
 {% endblock %}

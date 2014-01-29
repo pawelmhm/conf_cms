@@ -1,7 +1,5 @@
 from django.db import models
 
-# Create your models here.
-
 class Abstract(models.Model):
     title = models.CharField(max_length=200)
     author = models.CharField(max_length=200)
@@ -18,6 +16,12 @@ class Post(models.Model):
     title = models.CharField(max_length=200)
     content = models.TextField()
     date = models.DateTimeField('date_submitted')
+    keyword = models.CharField(max_length=100)
 
     def __unicode__(self):
         return self.title
+
+class Participant(models.Model):
+    name = models.CharField(max_length=200)
+    email = models.EmailField()
+    affiliation = models.CharField(max_length=100)
