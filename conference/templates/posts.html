@@ -2,7 +2,18 @@
 
 {% block content %}
 <h2>Posts</h2>
+
     {% for post in posts %}
     <p><a href="{{post.id}}"> {{ post.title }} </a> </p>
     {% endfor %}
-{% endblock %}
+    <script type="text/template" id="newPost">
+    <form action="" method="post">
+    {% for field in form %}
+        <label> field.label </label>
+        {{field }}
+    {% endfor %}
+    <input type="submit" value="add">
+    </script>
+    {% load static %}
+    <script src="{% static 'js/posts.js' %}"></script>
+    {% endblock %}

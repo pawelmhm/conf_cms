@@ -68,3 +68,10 @@ class SimpleTest(TestCase):
 
     def testAuthentication(self):
         pass
+
+    def testDelete(self):
+        posts = Post.objects.all()
+        before = len(posts)
+        self.client.delete('/admin/posts/%s' % (posts[0].id,))
+        after = len(Post.objects.all())
+        self.assertEqual(before-1,after)

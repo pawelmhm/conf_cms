@@ -3,7 +3,10 @@
 {% block content %}
 <form action="" method="post"> {% csrf_token %}
 {{form.as_p}}
-<input type="submit" class="pure-button">
+<input type="submit" value="save"class="pure-button">
+<button id="deleteButton" class="pure-button">Delete</button>
+<button id="leave" class="pure-button">Leave as is</button>
 </form>
-
+{% load static %}
+<script src="{% static 'js/postDetail.js' %}"></script>
 {% endblock %}

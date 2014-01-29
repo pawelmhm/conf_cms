@@ -43,7 +43,9 @@ class PostView(View):
 class PostsHtml(PostView):
     def get(self,request):
         posts = self.getAll()
-        return render_to_response('posts.html', posts)
+        form = PostForm()
+        posts["form"] = form
+        return render_to_response('posts.html',posts)
 
 class OnePost(View):
     def get(self,request,num):
@@ -58,19 +60,24 @@ class OnePost(View):
         post = Post.objects.filter(pk=num).update(title=request.POST["title"],content=request.POST["content"])
         return redirect('/admin/posts')
 
+    def delete(self,request,num):
+        posts = Post.objects.filter(pk=num)
+        posts.delete()
+        return HttpResponse("Items deleted")
+
 class Logs(View):
     def get(self,request):
         return render_to_response('logs.html')
 
 def home(request):
-    form = AbstractForm()
-    keynotes = Post.objects.get(keyword="keynotes")
-    about = Post.objects.filter(keyword="about")[0]
-    clp = Post.objects.get(keyword="clp")
-    getThere = Post.objects.get(keyword="gettingThere")
-    technical = Post.objects.get(keyword="technical")
-    return render_to_response('index.html',{"form":form, "about":about, "keynotes":keynotes, "clp":clp, "getThere":getThere,
-        "technical":technical})
+    data = {}
+    data["form"] = AbstractForm()
+    keyArticles = ["keynotes","about","clp","gettingThere","technical"]
+    for keyword in keyArticles:
+        article = Post.objects.filter(keyword=keyword)
+        if len(article) >= 1:
+            data[keyword] = article[0]
+    return render_to_response('index.html',data)
 
 def getAdmin(request):
     return render_to_response('admin.html')
