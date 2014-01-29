@@ -27,6 +27,7 @@ class Abstracts(View):
 class OneAbstract(View):
     def get(self,request,num):
         abstract = Abstract.objects.get(pk=num)
+
         return render_to_response('oneAbstract.html',{"abstract":abstract,
             "num":num})
 
