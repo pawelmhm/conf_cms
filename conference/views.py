@@ -1,5 +1,3 @@
-# Create your views here.
-
 from django.http import HttpResponse
 from django.template.loader import render_to_string
 from django.views.generic.base import View
@@ -7,6 +5,10 @@ from django.shortcuts import render_to_response,redirect
 from django.core.context_processors import csrf
 from django.template import RequestContext
 from django.utils.timezone import utc
+from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
+from django.contrib.auth.forms import AuthenticationForm
+from django.contrib.auth import authenticate, login, logout
 
 from conference.models import Abstract,Post
 from rest_framework.renderers import JSONRenderer
@@ -21,28 +23,82 @@ class JSONResponse(HttpResponse):
         kwargs["content_type"] = 'application/json'
         super(JSONResponse, self).__init__(content,**kwargs)
 
-class Abstracts(View):
-    def get(self,request,*args,**kwargs):
-        abstracts = Abstract.objects.all()
-        return render_to_response('abstracts.html', {"abstracts":abstracts})
+class Home(View):
+    def get_articles(self):
+        content = {}
+        keyArticles = ["keynotes","about","clp","gettingThere","technical"]
+        for keyword in keyArticles:
+            article = Post.objects.filter(keyword=keyword)
+            if len(article) >= 1:
+                content[keyword] = article[0]
+        return content
+
+    def get(self,request,**kwargs):
+        content = self.get_articles()
+        content["form"] = AbstractForm()
+        return render_to_response('index.html',content,
+            context_instance=RequestContext(request))
 
     def post(self,request):
+        content = self.get_articles()
         form = AbstractForm(request.POST)
         if form.is_valid():
             abstr = form.save(commit=False)
             abstr.date = datetime.datetime.utcnow().replace(tzinfo=utc)
             abstr.save()
-            return JSONResponse('all clear')
+            return redirect('/')
         else:
-            return redirect('/#register')#JSONResponse(form.errors)
+            content["form"] = form
+            return render_to_response('index.html',content,
+            context_instance=RequestContext(request))
 
-class OneAbstract(View):
+class Admin(View):
+    def get(self,request,*args,**kwargs):
+        if request.user.is_authenticated():
+            return render_to_response('admin.html')
+        else:
+            form = AuthenticationForm()
+            return render_to_response('login.html', {"form":form}, context_instance=RequestContext(request))
+
+    def post(self,request,*args,**kwargs):
+        username = request.POST['username']
+        password = request.POST['password']
+        user = authenticate(username=username,password=password)
+        if user is not None:
+            if user.is_active:
+                login(request,user)
+                return render_to_response('admin.html')
+            else:
+                pass
+        else:
+            form = AuthenticationForm(request.POST)
+            return render_to_response('login.html',{"form":form},context_instance=RequestContext(request))
+
+def viewLogout(request):
+    logout(request)
+    return redirect('/')
+
+#
+# Admin backend
+#
+
+class ProtectedView(View):
+    @method_decorator(login_required)
+    def dispatch(self,*args,**kwargs):
+        return super(ProtectedView,self).dispatch(*args,**kwargs)
+
+class Abstracts(ProtectedView):
+    def get(self,request,*args,**kwargs):
+        abstracts = Abstract.objects.all()
+        return render_to_response('abstracts.html', {"abstracts":abstracts})
+
+class OneAbstract(ProtectedView):
     def get(self,request,num):
         abstract = Abstract.objects.get(pk=num)
         return render_to_response('oneAbstract.html',{"abstract":abstract,
             "num":num})
 
-class PostView(View):
+class PostView(ProtectedView):
     def getAll(self):
         posts = Post.objects.all()
         return {"posts":posts}
@@ -58,7 +114,7 @@ class PostsHtml(PostView):
         posts["form"] = form
         return render_to_response('posts.html',posts)
 
-class OnePost(View):
+class OnePost(PostView):
     def get(self,request,num):
         c = {}
         c.update(csrf(request))
@@ -76,37 +132,7 @@ class OnePost(View):
         posts.delete()
         return HttpResponse("Items deleted")
 
-class Logs(View):
+class Logs(ProtectedView):
     def get(self,request):
         return render_to_response('logs.html')
 
-def home(request,**kwargs):
-    content = {}
-    keyArticles = ["keynotes","about","clp","gettingThere","technical"]
-    for keyword in keyArticles:
-        article = Post.objects.filter(keyword=keyword)
-        if len(article) >= 1:
-            content[keyword] = article[0]
-
-    if request.method == "POST":
-        form = AbstractForm(request.POST)
-        if form.is_valid():
-            abstr = form.save(commit=False)
-            abstr.date = datetime.datetime.utcnow().replace(tzinfo=utc)
-            abstr.save()
-            return redirect('/') #HttpResponse(status=201)
-        else:
-            content["form"] = form
-            return render_to_response('index.html',content,
-            context_instance=RequestContext(request))
-
-    elif request.method == "GET":
-        content["form"] = AbstractForm()
-        return render_to_response('index.html',content,
-            context_instance=RequestContext(request))
-
-def getAdmin(request):
-    return render_to_response('admin.html')
-
-def getArticles():
-    pass

@@ -37,6 +37,7 @@ class SimpleTest(TestCase):
         self.testAbs = abstract
         abstract.save()
 
+class TestOpen(SimpleTest):
     def testHomePage(self):
         response = self.client.get('/')
         self.assertEqual(response.status_code,200)
@@ -53,8 +54,6 @@ class SimpleTest(TestCase):
     def testAbstracts(self):
         abstracts = Abstract.objects.all()
         self.assertNotEqual(len(abstracts),0)
-        firstAbs = Abstract.objects.get(pk=1)
-        self.assertEqual(firstAbs.id,1)
 
     def testAllSubPages(self):
         uts = [self.testPost,self.testAbs]
@@ -90,10 +89,8 @@ class SimpleTest(TestCase):
         self.assertEqual(len(checkDb),0)
 
         # now actually post fake abstract
-        response = self.client.post("/admin/abstracts/", fakeAbs, follow=True)
+        response = self.client.post("/", fakeAbs, follow=True)
         self.assertEqual(response.status_code,200)
-        responseJson = json.loads(response.content)
-        self.assertEqual(responseJson,"all clear")
 
         # even if response is valid it can not be in database
         checkDb = Abstract.objects.filter(title=fakeAbs["title"])
@@ -102,14 +99,19 @@ class SimpleTest(TestCase):
 
     def testPostInvalidAbs(self):
         # invalid all fields blank
+
         fakeAbs = {"author": "", "content":"",
             "affiliation":"", "title":"","email":""}
-        response = self.client.post('/admin/abstracts/',fakeAbs,follow=True)
-        responseJson = json.loads(response.content)
+        checkDb = Abstract.objects.filter(title=fakeAbs["title"])
+        self.assertEqual(len(checkDb),0)
+
+        response = self.client.post('/',fakeAbs,follow=True)
         self.assertEqual(response.status_code,200)
-        # it should stil return 200
-        # but with errors
-        self.assertNotIn('all clear',response.content)
+
+        checkDb = Abstract.objects.filter(title=fakeAbs["title"])
+        self.assertEqual(len(checkDb),0)
+
+        self.assertIn('field is required',response.content)
 
     def testPostInvalidAbsTwo(self):
         # too long fields
@@ -117,12 +119,10 @@ class SimpleTest(TestCase):
                 "title":"".join(self.fake.paragraphs(nb=100)),
                 "content":self.fake.sentence(),"email":self.fake.email(),
                 "affiliation":self.fake.name()}
-        response = self.client.post('/admin/abstracts/',fakeAbs,follow=True)
-        responseJson = json.loads(response.content)
+        response = self.client.post('/',fakeAbs,follow=True)
         self.assertEqual(response.status_code,200)
-        self.assertNotIn("all clear",responseJson)
 
-    def testPostSpam(self):
-        # test spam blocker
-        pass
-
+class TestAuth(SimpleTest):
+    def testPosts(self):
+        response = self.client.get('/admin/posts/')
+        self.assertNotEqual(200,response.status_code)

@@ -1,5 +1,6 @@
 from django.forms import ModelForm, HiddenInput
 from conference.models import Abstract, Post, Participant
+from django.contrib.auth.models import Permission, User
 
 class AbstractForm(ModelForm):
     class Meta:
@@ -13,3 +14,4 @@ class NoAbstract(ModelForm):
 class PostForm(ModelForm):
     class Meta:
         model = Post
+
