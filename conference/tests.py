@@ -11,15 +11,16 @@ from faker import Factory
 from conference.models import Post, Abstract
 import datetime
 from django.utils.timezone import utc
+import json
 
 class SimpleTest(TestCase):
     def setUp(self):
         self.client = Client()
-        fake = Factory.create()
+        self.fake = Factory.create()
         keywords = ["keynotes","about","clp","gettingThere","technical"]
         for key in keywords:
-            post = Post(title=fake.sentence(),
-                content="\n".join(fake.paragraphs(nb=7)),
+            post = Post(title=self.fake.sentence(),
+                content="\n".join(self.fake.paragraphs(nb=7)),
                 date=datetime.datetime.utcnow().replace(tzinfo=utc),
                 keyword=key)
             if key == "about":
@@ -28,9 +29,9 @@ class SimpleTest(TestCase):
 
         self.adminPages = ['posts','abstracts','logs']
 
-        abstract = Abstract(title=fake.sentence(),
-                author=fake.name(),content=fake.text(),
-                email=fake.email(),
+        abstract = Abstract(title=self.fake.sentence(),
+                author=self.fake.name(),content=self.fake.text(),
+                email=self.fake.email(),
                 date=datetime.datetime.utcnow().replace(tzinfo=utc)
                 )
         self.testAbs = abstract
@@ -75,3 +76,53 @@ class SimpleTest(TestCase):
         self.client.delete('/admin/posts/%s' % (posts[0].id,))
         after = len(Post.objects.all())
         self.assertEqual(before-1,after)
+
+    def testPostAbstract(self):
+        fakeAbs = {"author": self.fake.name(),
+                "content":"\n".join(self.fake.paragraphs(nb=5)),
+            "affiliation":self.fake.word(),
+            "title":self.fake.sentence(),
+            "email":self.fake.email(),
+            "date":datetime.datetime.utcnow().replace(tzinfo=utc)}
+
+        # ensure there is no abstract with this title before post
+        checkDb = Abstract.objects.filter(title=fakeAbs["title"])
+        self.assertEqual(len(checkDb),0)
+
+        # now actually post fake abstract
+        response = self.client.post("/admin/abstracts/", fakeAbs, follow=True)
+        self.assertEqual(response.status_code,200)
+        responseJson = json.loads(response.content)
+        self.assertEqual(responseJson,"all clear")
+
+        # even if response is valid it can not be in database
+        checkDb = Abstract.objects.filter(title=fakeAbs["title"])
+        self.assertNotEqual(len(checkDb),0)
+        self.assertEqual(checkDb[0].title,fakeAbs["title"])
+
+    def testPostInvalidAbs(self):
+        # invalid all fields blank
+        fakeAbs = {"author": "", "content":"",
+            "affiliation":"", "title":"","email":""}
+        response = self.client.post('/admin/abstracts/',fakeAbs,follow=True)
+        responseJson = json.loads(response.content)
+        self.assertEqual(response.status_code,200)
+        # it should stil return 200
+        # but with errors
+        self.assertNotIn('all clear',response.content)
+
+    def testPostInvalidAbsTwo(self):
+        # too long fields
+        fakeAbs = {"author":"<script>alert('sss')</script>",
+                "title":"".join(self.fake.paragraphs(nb=100)),
+                "content":self.fake.sentence(),"email":self.fake.email(),
+                "affiliation":self.fake.name()}
+        response = self.client.post('/admin/abstracts/',fakeAbs,follow=True)
+        responseJson = json.loads(response.content)
+        self.assertEqual(response.status_code,200)
+        self.assertNotIn("all clear",responseJson)
+
+    def testPostSpam(self):
+        # test spam blocker
+        pass
+

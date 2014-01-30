@@ -1,4 +1,4 @@
-from django.forms import ModelForm
+from django.forms import ModelForm, HiddenInput
 from conference.models import Abstract, Post, Participant
 
 class AbstractForm(ModelForm):

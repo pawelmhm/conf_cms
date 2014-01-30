@@ -5,7 +5,7 @@ class Abstract(models.Model):
     author = models.CharField(max_length=200)
     date = models.DateTimeField('date_submitted')
     email = models.EmailField(max_length=100)
-    content = models.TextField()
+    content = models.TextField(max_length=1000)
     affiliation = models.CharField(max_length=200)
 
     def __unicode__(self):

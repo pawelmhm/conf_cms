@@ -1,9 +1,7 @@
 from django.conf.urls import patterns, include, url
-#from django.contrib import admin
 import rest_framework
 from conference import views
 from conference.views import Abstracts,OneAbstract,PostsHtml,Logs,OnePost
-#admin.autodiscover()
 
 urlpatterns = patterns('',
     url(r'^$', views.home, name='home'),
