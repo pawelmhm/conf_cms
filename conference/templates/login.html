@@ -5,28 +5,27 @@
     {% load staticfiles %}
     <link rel="stylesheet" href='{% static "css/pure-min.css" %}'>    
     <link rel="stylesheet" href='{% static "css/side-menu.css" %}'>    
-    </head>
+</head>
 <body>
- <div class="content">
-            <h2 class="content-head is-center">Secret entrance for organizers</h2>
-            <div class="pure-g">
-                <div id="form-box" class="l-box-lrg pure-u-1 pure-u-med-2-5">
-                    <form id="auth-form" class="pure-form pure-form-stacked" action='' method="post">{% csrf_token %}
-                        <legend> Login </legend>
-                        <fieldset>   
-                            {% for field in form %}
-                            <label> {{field.label}}</label>
-                            {{field}}
-                            {% for error in field.errors %}
-                            {{ error }}
-                            {% endfor %}
-                            {% endfor %}
-                        <input type="submit" value="Login" class="pure-button" id="submitAbstract">
-                        </fieldset>
-                    </form>
-                 </div>
-            </div>
-         </div>
-
+    <div class="content">
+        <h2 class="content-head is-center">Secret entrance for organizers</h2>
+        <div class="pure-g">
+            <div id="form-box" class="l-box-lrg pure-u-1 pure-u-med-2-5">
+                <form id="auth-form" class="pure-form pure-form-stacked" action='' method="post">{% csrf_token %}
+                    <legend> Login </legend>
+                    <fieldset>   
+                        {% for field in form %}
+                        <label> {{field.label}}</label>
+                        {{field}}
+                        {% for error in field.errors %}
+                        {{ error }}
+                        {% endfor %}
+                        {% endfor %}
+                    <input type="submit" value="Login" class="pure-button" id="submitAbstract">
+                    </fieldset>
+                </form>
+             </div>
+        </div>
+     </div>
 </body>
 </html>

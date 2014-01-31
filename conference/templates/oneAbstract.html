@@ -7,5 +7,35 @@
     <p> {{abstract.content}} </p>
     <p> Affiliation {{ abstract.affilliation }} </p>
     <p> Email {{ abstract.email }} </p>
-
+    <div class="pure-g">
+        <div class="l-box-lrg pure-u-1-2">
+            {% for comment in comments %}
+            <div class="l-box comment">
+                <h4>{{comment.author}} gave it: {{ comment.rating }} </h4>
+            
+                 {{ comment.content }} 
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    <div class="pure-g">
+        <div class="l-box-lrg pure-u-1-2">
+            <form id="comment-form" class="pure-form pure-form-stacked" action='' method="post">
+                <legend> Comment on Abstract </legend>
+                {% csrf_token %}
+                <fieldset> 
+                    {% for field in commentForm %}
+                        <label> {{ field.label }} </label>
+                        {{field }}
+                        {% if field.errors %}
+                            {% for error in field.errors %}
+                                {{ error }}
+                            {% endfor %}
+                        {% endif %}
+                    {% endfor %}
+                    <input type="submit" class="pure-button">
+                </fieldset>
+             </form>
+        </div>
+    </div>
 {% endblock %}

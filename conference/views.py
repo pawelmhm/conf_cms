@@ -10,11 +10,11 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
 
-from conference.models import Abstract,Post
+from conference.models import Abstract,Post,Comment
 from rest_framework.renderers import JSONRenderer
 from rest_framework.parsers import JSONParser
 from conference.serializers import AbstractSerial
-from conference.forms import AbstractForm, PostForm
+from conference.forms import AbstractForm, PostForm, CommentForm
 import datetime
 
 class JSONResponse(HttpResponse):
@@ -52,6 +52,11 @@ class Home(View):
             return render_to_response('index.html',content,
             context_instance=RequestContext(request))
 
+#
+# Admin backend
+#
+
+
 class Admin(View):
     def get(self,request,*args,**kwargs):
         if request.user.is_authenticated():
@@ -78,10 +83,6 @@ def viewLogout(request):
     logout(request)
     return redirect('/')
 
-#
-# Admin backend
-#
-
 class ProtectedView(View):
     @method_decorator(login_required)
     def dispatch(self,*args,**kwargs):
@@ -93,10 +94,29 @@ class Abstracts(ProtectedView):
         return render_to_response('abstracts.html', {"abstracts":abstracts})
 
 class OneAbstract(ProtectedView):
-    def get(self,request,num):
+    def simpleResponse(self,request,num,commentForm):
         abstract = Abstract.objects.get(pk=num)
+        comments = Comment.objects.filter(abstract__exact=abstract)
         return render_to_response('oneAbstract.html',{"abstract":abstract,
-            "num":num})
+            "num":num, "commentForm":commentForm, "comments": comments},context_instance=RequestContext(request))
+
+    def get(self,request,num,*args,**kwargs):
+        commentForm = CommentForm()
+        return self.simpleResponse(request,num,commentForm)
+
+    def post(self,request,num):
+        # post here posts a comment on a given abstract
+        # abstracts themselves should not be modified at all
+        abstr = Abstract.objects.get(pk=num)
+        commentForm = CommentForm(request.POST)
+        if commentForm.is_valid():
+            comment = Comment(abstract=abstr,author=request.user,
+                    content=request.POST["content"],rating=request.POST["rating"])
+            comment.save()
+            return redirect('/admin/abstracts/%s' % (num,))
+        else:
+            return self.simpleResponse(request,num,commentForm)
+
 
 class PostView(ProtectedView):
     def getAll(self):
