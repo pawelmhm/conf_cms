@@ -1,7 +1,12 @@
 {% extends "layout.html" %}
 
 {% block content %}
+<div class="header">
     <h3>Abstracts</h3>
+    <p>We have  <b> {{ count }} </b> abstracts.</p>
+</div>
+
+<div class="content">
     <table class="pure-table pure-table-horizontal">
         <thead>
             <tr>
@@ -9,22 +14,20 @@
                 <th>author</th>
                 <th>title</th>
                 <th>date</th>
-                <th>affiliation</th>
-                <th>Our Rating</th>
+                <th>Our Rating (average)</th>
             </tr>
         </thead>
         <tbody>
             {% for abs in abstracts %}
-            
             <tr>    
                 <td> {{abs.id}} </td>
                 <td> {{abs.author}} </td>
                 <td><a href='{{abs.id}}'> {{abs.title}} </a></td>
                 <td> {{abs.date}} </td>
-                <td> {{abs.affilliation}} </td>
-                <td> Blank </td>
+                <td> {{abs.avg}} </td>
             </tr>
             {% endfor %}
         </tbody>
     </table>
-{% endblock %}
+</div>
+    {% endblock %}

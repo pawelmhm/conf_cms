@@ -1,5 +1,6 @@
 body {
-font-family: 'Open Sans', sans-serif;
+    font-family: 'Philosopher', sans-serif;
+    color:#1D353D;
 }
 
 #map-canvas {
@@ -7,4 +8,72 @@ font-family: 'Open Sans', sans-serif;
 }
 
 .comment {
+    padding:12px;
+    margin:12px;
+}
+
+.comments {
+}
+
+.comment-h {
+    color:white;
+    background:black;
+    padding:7px;
+    font-style:none;
+}
+
+.commentForm {
+    margin-top:30px;
+    border-top:2px solid #000;
+}
+
+.splash-container {
+    background:#C2C1A5;
+}
+
+.home-menu.pure-menu-open {
+    background:#A89A70;
+}
+
+.home-menu a {
+    color:white;
+}
+
+a.pure-button-primary {
+    background:#A89A70;
+    color:white;
+}
+
+.pure-button-primary, .pure-button {
+    background:#A89A70;
+    color:white;
+}
+
+h1 {
+    color:#1D353D;
+}
+
+.splash-subhead {
+    color:#1D353D;
+}
+
+.content {
+    margin:30px;
+}
+
+.content-back {
+    margin:0;
+}
+
+.home-menu li a:hover {
+    color:#3D6661;
+}
+
+#menu .pure-menu-heading {
+    background:inherit;
+}
+
+#directions {
+   margin:5%;
+
 }

@@ -1,7 +1,30 @@
 {% extends "layout.html" %}
 
 {% block content %}
-    <h2 class="content=subheader"> Some stats about recent activity</h2>
-    <p> Abstracts submitted ... </p>
-    <p> Last visit of </p>
+    <div class="header">
+        <h2 class="content-subheader"> Some stats about recent activity</h2>
+    <h4> {{ timedelta }} days remaining to conference </h4> 
+    <h4>  {{ count }} abstracts received </h4>
+</div>
+<div class="content">    
+<div class="pure-g">
+        <div class="pure-u-1-2">
+            
+        <h4> Abstracts not reviewed yet: </h4>
+            <ul>
+                {% for abs in abstracts %}
+                <li> <a href="/admin/abstracts/{{abs.id}}">{{abs.author}} - {{ abs.title }}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        <div class="pure-u-1-2">
+            <h4>Posts:</h4>
+            <ul>
+                {% for post in posts %}
+                <li><a href="/admin/posts/{{post.id}}">{{post.title}}</a></li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+</div>
 {% endblock %}

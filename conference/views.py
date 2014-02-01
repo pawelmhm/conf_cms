@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
+from django.db import connection
 
 from conference.models import Abstract,Post,Comment
 from rest_framework.renderers import JSONRenderer
@@ -56,11 +57,16 @@ class Home(View):
 # Admin backend
 #
 
-
 class Admin(View):
     def get(self,request,*args,**kwargs):
         if request.user.is_authenticated():
-            return render_to_response('admin.html')
+            abstracts = Abstract.objects.all()
+            posts = Post.objects.all()
+            timedelta = datetime.date(2014,11,29) - datetime.date.today()
+            timedelta = timedelta.days
+            count = len(abstracts)
+            abstracts = [a for a in list(abstracts) if a.avg == None]
+            return render_to_response('admin.html',{"abstracts":abstracts,"posts":posts, "timedelta":timedelta,"count":count})
         else:
             form = AuthenticationForm()
             return render_to_response('login.html', {"form":form}, context_instance=RequestContext(request))
@@ -70,11 +76,8 @@ class Admin(View):
         password = request.POST['password']
         user = authenticate(username=username,password=password)
         if user is not None:
-            if user.is_active:
-                login(request,user)
-                return render_to_response('admin.html')
-            else:
-                pass
+            login(request,user)
+            return render_to_response('admin.html')
         else:
             form = AuthenticationForm(request.POST)
             return render_to_response('login.html',{"form":form},context_instance=RequestContext(request))
@@ -91,11 +94,18 @@ class ProtectedView(View):
 class Abstracts(ProtectedView):
     def get(self,request,*args,**kwargs):
         abstracts = Abstract.objects.all()
-        return render_to_response('abstracts.html', {"abstracts":abstracts})
+        abstracts = sorted(list(abstracts),key=lambda a: a.avg,reverse=True)
+        count = len(abstracts)
+        return render_to_response('abstracts.html', {"abstracts":abstracts, "count":count})
+
 
 class OneAbstract(ProtectedView):
     def simpleResponse(self,request,num,commentForm):
-        abstract = Abstract.objects.get(pk=num)
+        abstract = Abstract.objects.filter(pk=num)
+        if len(abstract) > 0:
+            abstract = abstract[0]
+        else:
+            return redirect('/admin/')
         comments = Comment.objects.filter(abstract__exact=abstract)
         return render_to_response('oneAbstract.html',{"abstract":abstract,
             "num":num, "commentForm":commentForm, "comments": comments},context_instance=RequestContext(request))
@@ -117,34 +127,33 @@ class OneAbstract(ProtectedView):
         else:
             return self.simpleResponse(request,num,commentForm)
 
-
-class PostView(ProtectedView):
-    def getAll(self):
-        posts = Post.objects.all()
-        return {"posts":posts}
-
-    def getOne(self,num):
-        post = Post.objects.get(pk=num)
-        return {"post":post}
-
-class PostsHtml(PostView):
+class PostsHtml(ProtectedView):
     def get(self,request):
-        posts = self.getAll()
+        posts = Post.objects.all()
         form = PostForm()
-        posts["form"] = form
-        return render_to_response('posts.html',posts)
+        return render_to_response('posts.html',{"posts":posts,"form":form})
 
-class OnePost(PostView):
+class OnePost(ProtectedView):
+    def baseResponse(self,request,num):
+        pass
+
     def get(self,request,num):
-        c = {}
-        c.update(csrf(request))
-        post = Post.objects.get(pk=num)
-        postForm = PostForm(instance=post)
+        post = Post.objects.filter(pk=num)
+        if len(post) == 0:
+            return redirect('/admin/')
+
+        postForm = PostForm(instance=post[0])
         return render_to_response('postDetail.html',{"form":postForm},context_instance=RequestContext(request))
 
     def post(self,request,num):
         postForm = PostForm(request.POST)
-        post = Post.objects.filter(pk=num).update(title=request.POST["title"],content=request.POST["content"])
+        if postForm.is_valid():
+            post = Post.objects.filter(pk=num).update(title=request.POST["title"],content=request.POST["content"])
+            return redirect('/admin/posts/')
+        else:
+            return redirect('/admin/posts/%s' % (num,))
+
+
         return redirect('/admin/posts')
 
     def delete(self,request,num):
@@ -153,6 +162,7 @@ class OnePost(PostView):
         return HttpResponse("Items deleted")
 
 class Logs(ProtectedView):
+    # obsolete
     def get(self,request):
         return render_to_response('logs.html')
 

@@ -13,29 +13,23 @@
     <a href="#menu" id="menuLink" class="menu-link"><span></span></a>
         <div id="menu">
             <div class="pure-menu pure-menu-open">
-                <a class="pure-menu-heading" href="/">Front End</a>
+                <a class="pure-menu-heading" href="/">BackToFront</a>
 
                 <ul>
-                    <li><a href="/admin">Home</a></li>
+                    <li><a href="/admin">Admin Home</a></li>
                     <li><a href="/admin/abstracts">Abstracts</a></li>
 
                     <li>
                         <a href="/admin/posts">Posts</a>
                     </li>
 
-                    <li><a href="/admin/logs">Access Log</a></li>
                     <li><a href="/admin/logout">Log Out</a></li>
                 </ul>
             </div>
         </div>
         <div id="main">
-            <div class="header">
-                <h2>Preparing the conference...</h2>
-            </div>
-            <div class="content">
                 {% block content %}{% endblock %}
-            </div>
-        </div>
+                   </div>
     </div>
     <script src="{% static 'js/ui.js' %}"></script>
 </body>

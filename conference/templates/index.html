@@ -7,10 +7,11 @@
     <link rel="stylesheet" href='{% static "css/pure-min.css" %}'>    
     <link rel="stylesheet" href='{% static "css/marketing.css" %}'>    
     <link rel="stylesheet" href='{% static "css/site-style.css" %}'>    
-    <!-- <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'> !-->
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <script type="text/javascript" src="{% static 'js/maps.js' %}"></script>
-    </head>
+   <link href='http://fonts.googleapis.com/css?family=Philosopher' rel='stylesheet' type='text/css'> </head>
 <body>
+{% autoescape off %}
 <a name="home"></a>
     <div class="header">
         <div class="home-menu pure-menu pure-menu-open pure-menu-horizontal pure-menu-fixed">
@@ -29,19 +30,17 @@
         <div class="splash">
             <h1><a name="home">Imagine There's No Humanities<a/></h1>
                 <p class="splash-subhead">
-                Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-            </p>
+                Take part in conference, Warsaw 28 November 2014
+                </p>
             <p>
                 <a href="#register" class="pure-button pure-button-primary">Register</a>
             </p>
-        
         </div>
-    
   </div>
     
   <div class="content-wrapper"> <a name="clp"></a>
       <div class="content">
-               <h2 class="content-head is-center">Call for Papers</h2>
+            <h2 class="content-head is-center">Call for Papers</h2>
              {{ clp.content }}
          
              <a name="keynotes"></a>
@@ -50,7 +49,7 @@
         </div>
       
         <div class="content">
-               <h2 class="content-head is-center">Keynotes</h2>
+            <h2 class="content-head is-center">{{ keynotes.title }}</h2>
             {{ keynotes.content }}
             <a name="about"></a> <p></p><p></p>
         </div>
@@ -71,20 +70,23 @@
                         </div>
                     </div>
                     <div class="pure-u-1-2">
-                        <h4> The conference takes place</h4>
-                        <p> in Warsaw at Dobra street </p>
-                        <button id="directions" class="pure-button pure-button-primary">
-                            Get Directions
-                            </button
+                        <h4> {{ gettingThere.title}}</h4>
+                        {{ gettingThere.content }}
+                        <div>
+                        <button id="directions" class="pure-button pure-button-primary is-center">
+                            How far is it?
+                        </button>
+                        <div id="directionsOutput">
+                        </div>
+                        </div>
                     </div>
                 </div>
                <a name="register"></a> <p></p><p></p>
         </div>
         
         <div class="content">
-               <h2 class="content-head is-center">Dolore magna aliqua. Uis aute irure.</h2>
+            <h2 class="content-head is-center">Register</h2>
             <div class="pure-g">
-                <!--  <script src="{% static 'js/form-helper.js' %}"></script> --!>
                 <div id="form-box" class="l-box-lrg pure-u-1 pure-u-med-2-5">
                     <form id="abstract-form" class="pure-form pure-form-stacked" action='' method="post">{% csrf_token %}
                         <legend> Registration Form </legend>
@@ -103,14 +105,12 @@
 
 
                 <div class="l-box-lrg pure-u-1 pure-u-med-2-5">
-                    <h4> Requirements </h4>
+                    <h4> {{ technical.title }} </h4>
                     {{ technical.content }}
-                    <h4> Something else </h4>
-                    {{ technical.title}}
                 </div>
             </div>
          </div>
      </div>
-
+{% endautoescape %}
 </body>
 </html>

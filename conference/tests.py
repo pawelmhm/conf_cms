@@ -24,6 +24,7 @@ class SimpleTest(TestCase):
         self.fakePosts()
         self.fakeAbstracts(5)
         self.fakeUsers(5)
+        self.insertComment(4)
 
     def fakePosts(self):
         for key in self.keywords:
@@ -53,6 +54,12 @@ class SimpleTest(TestCase):
         self.user = user
         self.fakePass = fakePass
 
+    def insertComment(self,num):
+        for i in range(num):
+            com = Comment(abstract=self.testAbs,author=self.user,
+                content=self.fake.sentence(),rating=4)
+            com.save()
+
     def getAdminPages(self,status_code):
         for page in self.adminPages:
             response = self.client.get('/admin/'+page+'/')
@@ -72,19 +79,14 @@ class SimpleTest(TestCase):
 
 
 class DbTest(SimpleTest):
-    def insertComment(self):
-        com = Comment(abstract=self.testAbs,author=self.user,
-                content=self.fake.sentence(),rating=4)
-        com.save()
-
     def testSaveComment(self):
         before = len(Comment.objects.all())
-        self.insertComment()
+        self.insertComment(1)
         after = len(Comment.objects.all())
         self.assertEqual(before+1,after)
 
     def testGetComment(self):
-        self.insertComment()
+        self.insertComment(1)
         com = Comment.objects.filter(abstract__exact=self.testAbs)
         self.assertEqual(len(com),1)
 
@@ -106,6 +108,7 @@ class TestOpen(SimpleTest):
     def testAbstracts(self):
         abstracts = Abstract.objects.all()
         self.assertNotEqual(len(abstracts),0)
+        print("abstracts avg %s" % (self.testAbs.avg,))
 
     def testAllSubPages(self):
         # no login all subpages should return 302
@@ -180,6 +183,7 @@ class TestAuth(SimpleTest):
 
     def testAdminSubPages(self):
         # same story for subpages
+        # all should be available
         self.login()
         self.getAdminSubPages(200)
 
