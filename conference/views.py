@@ -12,9 +12,6 @@ from django.contrib.auth import authenticate, login, logout
 from django.db import connection
 
 from conference.models import Abstract,Post,Comment
-from rest_framework.renderers import JSONRenderer
-from rest_framework.parsers import JSONParser
-from conference.serializers import AbstractSerial
 from conference.forms import AbstractForm, PostForm, CommentForm
 import datetime
 

@@ -1,12 +1,10 @@
 from django.conf.urls import patterns, include, url
-import rest_framework
 from conference import views
 from conference.views import Abstracts,OneAbstract,PostsHtml,Logs,OnePost,Home,Admin
 
 urlpatterns = patterns('',
     url(r'^$', Home.as_view(), name='home'),
     url(r'^admin/$',Admin.as_view(), name="adminView"),
-    url(r'^api/', include('rest_framework.urls', namespace='rest_framework')),
     url(r'^admin/abstracts/$', Abstracts.as_view(),name='abstractsView'),
     url(r'^admin/abstracts/(\d+)$', OneAbstract.as_view(),name='abstractsView'),
     url(r'^admin/posts/$',PostsHtml.as_view(),name="postView"),
