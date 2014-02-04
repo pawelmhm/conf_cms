@@ -24,9 +24,11 @@
                 <li><a href="#register">Register</a></li>
             </ul>
         </div>
+   
     </div>
       
     <div class="splash-container" id="yui_3_14_1_1_1390926711441_8">
+        
         <div class="splash">
             <h1><a name="home">Imagine There's No Humanities<a/></h1>
                 <p class="splash-subhead">
@@ -85,6 +87,14 @@
         </div>
         
         <div class="content">
+            
+            <div class="message">
+                {% if messages %}
+                {% for message in messages %}
+                        <h2> {{ message }} </h2>
+                    {% endfor %}
+                </div>
+                {% else %}
             <h2 class="content-head is-center">Register</h2>
             <div class="pure-g">
                 <div id="form-box" class="l-box-lrg pure-u-1 pure-u-med-2-5">
@@ -108,6 +118,7 @@
                     <h4> {{ technical.title }} </h4>
                     {{ technical.content }}
                 </div>
+                {% endif %}
             </div>
          </div>
      </div>
