@@ -9,6 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 from django.contrib.auth.forms import AuthenticationForm
 from django.contrib.auth import authenticate, login, logout
+from django.contrib import messages
 from django.db import connection
 
 from conference.models import Abstract,Post,Comment
@@ -28,6 +29,7 @@ class Home(View):
     def get(self,request,**kwargs):
         content = self.get_articles()
         content["form"] = AbstractForm()
+
         return render_to_response('index.html',content,
             context_instance=RequestContext(request))
 
@@ -38,7 +40,9 @@ class Home(View):
             abstr = form.save(commit=False)
             abstr.date = datetime.datetime.utcnow().replace(tzinfo=utc)
             abstr.save()
-            return redirect('/')
+            messages.info(request,"Thank you for submission. We will notify you about" \
+                " our decision as soon as possible.")
+            return redirect('/#register')
         else:
             content["form"] = form
             return render_to_response('index.html',content,

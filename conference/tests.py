@@ -142,6 +142,7 @@ class TestOpen(SimpleTest):
         checkDb = Abstract.objects.filter(title=fakeAbs["title"])
         self.assertNotEqual(len(checkDb),0)
         self.assertEqual(checkDb[0].title,fakeAbs["title"])
+        self.assertIn('Thank you for submission.',response.content)
 
     def testPostInvalidAbs(self):
         # invalid all fields blank
