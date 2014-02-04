@@ -5,6 +5,8 @@
     <h3>Posts</h3>
 </div>
 <div class="content">
+    <a href="{% url 'addPost' %}" class="pure-button">Add new</a>
+    
     {% for post in posts %}
     <p><a href="{{post.id}}"> {{ post.title }} </a> </p>
     {% endfor %}

@@ -15,12 +15,6 @@ from conference.models import Abstract,Post,Comment
 from conference.forms import AbstractForm, PostForm, CommentForm
 import datetime
 
-class JSONResponse(HttpResponse):
-    def __init__(self, data, *args,**kwargs):
-        content = JSONRenderer().render(data)
-        kwargs["content_type"] = 'application/json'
-        super(JSONResponse, self).__init__(content,**kwargs)
-
 class Home(View):
     def get_articles(self):
         content = {}
@@ -138,7 +132,6 @@ class OnePost(ProtectedView):
         post = Post.objects.filter(pk=num)
         if len(post) == 0:
             return redirect('/admin/')
-
         postForm = PostForm(instance=post[0])
         return render_to_response('postDetail.html',{"form":postForm},context_instance=RequestContext(request))
 
@@ -150,16 +143,22 @@ class OnePost(ProtectedView):
         else:
             return redirect('/admin/posts/%s' % (num,))
 
-
-        return redirect('/admin/posts')
-
     def delete(self,request,num):
         posts = Post.objects.filter(pk=num)
         posts.delete()
         return HttpResponse("Items deleted")
 
-class Logs(ProtectedView):
-    # obsolete
+class AddPost(ProtectedView):
     def get(self,request):
-        return render_to_response('logs.html')
+        form = PostForm()
+        return render_to_response('postDetail.html',{"form":form},context_instance=RequestContext(request))
 
+    def post(self,request):
+        postForm = PostForm(request.POST)
+        if postForm.is_valid():
+            post = postForm.save(commit=False)
+            post.date = datetime.datetime.utcnow().replace(tzinfo=utc)
+            post.save()
+            return redirect('/admin/posts/')
+        else:
+            return render_to_response('postDetail.html',{"form":postForm},context_instance=RequestContext(request))

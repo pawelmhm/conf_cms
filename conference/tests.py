@@ -18,7 +18,7 @@ class SimpleTest(TestCase):
         self.client = Client()
         self.fake = Factory.create()
         self.keywords = ["keynotes","about","clp","gettingThere","technical"]
-        self.adminPages = ['posts','abstracts','logs']
+        self.adminPages = ['posts','abstracts']
 
         # generate some fake data
         self.fakePosts()
@@ -76,8 +76,6 @@ class SimpleTest(TestCase):
                     "{status}  {url}".format(status=response.status_code,url=url))
             i += 1
 
-
-
 class DbTest(SimpleTest):
     def testSaveComment(self):
         before = len(Comment.objects.all())
@@ -108,7 +106,6 @@ class TestOpen(SimpleTest):
     def testAbstracts(self):
         abstracts = Abstract.objects.all()
         self.assertNotEqual(len(abstracts),0)
-        print("abstracts avg %s" % (self.testAbs.avg,))
 
     def testAllSubPages(self):
         # no login all subpages should return 302
@@ -211,3 +208,18 @@ class TestAuth(SimpleTest):
         response = self.client.post('/admin/abstracts/%s' % (abstr.id), {"rating":29,"content":self.fake.sentence()},follow=True)
         self.assertIn("less than or equal to 5",response.content)
 
+    def testAddPost(self):
+        self.login()
+        response = self.client.get('/admin/posts/new')
+        self.assertEqual(response.status_code,200)
+
+        data = {"title":self.fake.word(),"keyword":"about","content":self.fake.sentence()}
+        response = self.client.post('/admin/posts/new',data,follow=True)
+        self.assertEqual(response.status_code,302)
+
+    def testInvalidAddPost(self):
+        self.login()
+        data = {"title":"","keyword":"","content":""}
+        response = self.client.post('/admin/posts/new',data)
+        self.assertEqual(response.status_code,200)
+        self.assertIn('the field is required',response.content)

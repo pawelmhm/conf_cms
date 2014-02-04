@@ -14,7 +14,7 @@ class NoAbstract(ModelForm):
 class PostForm(ModelForm):
     class Meta:
         model = Post
-        fields = ["title","content"]
+        fields = ["title","content",'keyword']
 
 class CommentForm(ModelForm):
     class Meta:
