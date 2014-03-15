@@ -98,7 +98,8 @@
             <h2 class="content-head is-center">Register</h2>
             <div class="pure-g">
                 <div id="form-box" class="l-box-lrg pure-u-1 pure-u-med-2-5">
-                    <form id="abstract-form" class="pure-form pure-form-stacked" action='' method="post">{% csrf_token %}
+                    <form enctype="multipart/form-data" id="abstract-form" class="pure-form pure-form-stacked" action='' method="post">{% csrf_token %}
+                        
                         <legend> Registration Form </legend>
                         <fieldset>   
                             {% for field in form %}

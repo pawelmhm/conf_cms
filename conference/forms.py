@@ -5,7 +5,7 @@ from django.contrib.auth.models import Permission, User
 class AbstractForm(ModelForm):
     class Meta:
         model = Abstract
-        fields = ["title","author","email","content","affiliation"]
+        fields = ["title","author","email","abstract_pdf"]
 
 class NoAbstract(ModelForm):
     class Meta:

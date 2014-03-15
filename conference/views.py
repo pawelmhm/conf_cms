@@ -15,6 +15,7 @@ from django.db import connection
 from conference.models import Abstract,Post,Comment
 from conference.forms import AbstractForm, PostForm, CommentForm
 import datetime
+import time
 
 class Home(View):
     def get_articles(self):
@@ -33,10 +34,11 @@ class Home(View):
         return render_to_response('index.html',content,
             context_instance=RequestContext(request))
 
-    def post(self,request):
+    def post(self, request):
         content = self.get_articles()
-        form = AbstractForm(request.POST)
+        form = AbstractForm(request.POST, request.FILES)
         if form.is_valid():
+            self.handle_file_upload(request.FILES["abstract_pdf"], request.POST["author"], request.POST["title"])
             abstr = form.save(commit=False)
             abstr.date = datetime.datetime.utcnow().replace(tzinfo=utc)
             abstr.save()
@@ -44,9 +46,19 @@ class Home(View):
                 " our decision as soon as possible.")
             return redirect('/#register')
         else:
+            print "file object %s, request %s" % (request.FILES,request)
             content["form"] = form
             return render_to_response('index.html',content,
-            context_instance=RequestContext(request))
+                context_instance=RequestContext(request))
+
+    def handle_file_upload(self, f, author, title):
+        filename_template = "media/{author}-{title}-{time}.pdf"
+        timestamp = time.time()
+        filename = filename_template.format(author=author, title=title, time=timestamp)
+        filename = filename.replace(" ","_")
+        with open(filename, "wb+") as destination:
+            for chunk in f.chunks():
+                destination.write(chunk)
 
 #
 # Admin backend

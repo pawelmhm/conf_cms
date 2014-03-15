@@ -9,8 +9,7 @@ class Abstract(models.Model):
     author = models.CharField(max_length=200)
     date = models.DateTimeField('date_submitted')
     email = models.EmailField(max_length=100)
-    content = models.TextField(max_length=1000)
-    affiliation = models.CharField(max_length=200)
+    abstract_pdf =  models.FileField(upload_to="media")
 
     def __init__(self,*args,**kwargs):
         super(Abstract,self).__init__(*args,**kwargs)
